@@ -123,11 +123,21 @@ func main() {
 	hashes := make(truthTable)
 	var found []ParsedFile
 
+	log.Println("[INF] Parsing existing files")
+	filepath.Walk(*dest, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return nil
+		}
+		hashes[NewParsedFile(path).md5sum] = true
+		return nil
+	})
+
+	log.Println("[INF] Parsing source files")
 	filepath.Walk(*source, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
 		}
-		log.Printf("Found: %s\n", path)
+		log.Printf("[INF] Found: %s\n", path)
 		f := NewParsedFile(path)
 		_, exists := hashes[f.md5sum]
 		if !exists {
@@ -142,7 +152,6 @@ func main() {
 	})
 
 	count := make(map[int]int)
-
 	for _, file := range found {
 		index := 13*file.fileinfo.ModTime().Year() + int(file.fileinfo.ModTime().Month())
 		count[index]++
