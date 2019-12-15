@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="0.1"
+[[ "x$1" = "x" ]] && version=`git log | head -1 | cut -f2 -d" " | colrm 10` || version="$1"
 
 mkdir -p build
 set -x
